@@ -1,1 +1,1 @@
-qemu-system-i386 -s -S -drive format=raw,file=zephyr.bin
+qemu-system-x86_64 -s -S -drive format=raw,file=zephyr.bin

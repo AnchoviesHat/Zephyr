@@ -2,12 +2,33 @@ org 0x7C00
 bits 16
 
 start:
+	cli
+
 	xor ax, ax
 	mov ds, ax
 	mov es, ax
 	mov ss, ax
 	mov sp, 0x7C00
 	mov bp, sp
+
+set_a20:
+; Wait for port not busy, write D1 to 0x64
+.1:
+	in al, 0x64    
+	test al, 0x2
+	jnz set_a20.1
+	
+	mov al, 0xD1
+	out 0x64, al
+
+; Wait for port not busy, write DF to 0x64
+.2:
+	in al, 0x64
+	test al, 0x2
+	jnz set_a20.2
+	
+	mov al, 0xDF
+	out 0x60, al
 
 read_disk:
 	mov ah, 0x2    ; Read sectors
@@ -24,7 +45,6 @@ read_disk:
 	call print_str
 
 to_protected:
-	cli
 	lgdt [gdtr]
 	mov eax, cr0
 	or eax, 1
@@ -54,10 +74,11 @@ flush:
 	jmp start32
 
 start32:
-	mov edx, 0xB8000 + 156
+	mov edx, 0xB8000 + 154
 	mov al, "a"
 	mov ah, 0xF
 	mov [edx], ax
+
 	jmp 0x7E00
 
 panic32:

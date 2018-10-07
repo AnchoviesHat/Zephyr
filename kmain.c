@@ -3,35 +3,37 @@
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
+typedef uint32_t u64;
 
+u8 *mem = 0;
 u16 *vga_mem = (u16 *)0xB8000;
 u16 cur = 0;
 
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 25
 
-void out_8(u16 port, u8 value) {
+void outb(u16 port, u8 value) {
 	asm volatile ("outb %1, %0" : : "dN" (port), "a" (value));
 }
 
-u8 in_8(u16 port) {
+u8 inb(u16 port) {
 	u8 rv;
 	asm volatile ("inb %1, %0" : "=a" (rv) : "dN" (port));
 	return rv;
 }
 
 void set_cursor(u16 pos) {
-	out_8(0x3D4, 0xF);
-	out_8(0x3D5, pos & 0xFF);
-	out_8(0x3D4, 0xE);
-	out_8(0x3D5, (pos >> 8) & 0xFF);
+	outb(0x3D4, 0xF);
+	outb(0x3D5, pos & 0xFF);
+	outb(0x3D4, 0xE);
+	outb(0x3D5, (pos >> 8) & 0xFF);
 }
 
 u16 get_cursor() {
-	out_8(0x3D4, 0xF);
-	u8 pos_lo = in_8(0x3D5);
-	out_8(0x3D4, 0xE);
-	u8 pos_hi = in_8(0x3D5);
+	outb(0x3D4, 0xF);
+	u8 pos_lo = inb(0x3D5);
+	outb(0x3D4, 0xE);
+	u8 pos_hi = inb(0x3D5);
 
 	return pos_hi << 8 | pos_lo;
 }
@@ -66,6 +68,12 @@ void puts(char *str) {
 		i++;
 	}
 	set_cursor(cur + i);
+}
+
+// Mask out the 8259A so we can use the APIC instead
+void disable_pic() {
+	outb(0x21, 0xFF);
+	outb(0xa1, 0xFF);
 }
 
 void kmain() {
