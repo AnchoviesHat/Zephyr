@@ -1,1 +1,1 @@
-qemu-system-x86_64 -drive format=raw,file=zephyr.bin
+qemu-system-x86_64 -boot d -cdrom zephyr.iso
