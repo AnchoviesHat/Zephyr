@@ -36,9 +36,33 @@ read_disk:
     mov ch, 0      ; cylinder idx
     mov dh, 0      ; head idx
     mov cl, 2      ; sector idx
-    mov bx, 0x7E00 ; target addr
+    mov bx, 0x8000 ; target addr
     int 0x13
     jc panic
+
+map_mem:
+    mov di, 0x7F00
+    push di
+    xor bp, bp
+    xor ebx, ebx
+m_loop:
+    mov edx, 0x534D4150
+    mov ecx, 20
+    mov eax, 0xE820
+    int 0x15
+
+    jc done
+    cmp eax, 0x534D4150
+    jne panic
+    test ebx, ebx
+    jz done
+
+    add di, 20
+    inc bp
+    jmp m_loop
+
+done:
+    mov [0x7E00], bp
 
     mov cx, boot_str_sz
     mov si, boot_str
@@ -79,7 +103,7 @@ start32:
     mov ah, 0xF
     mov [edx], ax
 
-    jmp 0x7E00
+    jmp 0x8000
 
 panic32:
     cli

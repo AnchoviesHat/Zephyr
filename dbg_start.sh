@@ -1,1 +1,1 @@
-qemu-system-x86_64 -s -S -boot d -cdrom zephyr.iso
+qemu-system-x86_64 -m 8M -s -S -boot d -cdrom zephyr.iso

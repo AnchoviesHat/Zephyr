@@ -3,7 +3,7 @@ OUTPUT_FORMAT("binary")
 ENTRY(stub32)
 
 SECTIONS {
-    . = 0x7E00;
+    . = 0x8000;
 
     .text : {
         *(.text)
