@@ -50,6 +50,7 @@ void kmain() {
 
     vga_printf("Found %dM of usable memory...\n", total_usable_memory / 1024 / 1024);
 
+    while(1){}
 
     halt();
 }

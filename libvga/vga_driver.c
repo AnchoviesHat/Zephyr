@@ -9,11 +9,6 @@ u16 *vga_mem = (u16*)0xB8000;
 u32 col = 2; // Which column we're writing in
 u32 row = 0; // Which row we're writing in
 
-struct ScreenChar {
-    char c;
-    Color color;
-};
-
 void vga_print_new_line() {
     ++row;
     col = 2;
