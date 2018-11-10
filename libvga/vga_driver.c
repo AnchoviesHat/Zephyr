@@ -62,6 +62,20 @@ void vga_puts(char *str) {
     vga_puts_color(str, White);
 }
 
+void vga_putc(char c) {
+    if (col >= VGA_WIDTH) {
+        vga_print_new_line();
+        col += 4;
+    }
+    if (c == '\n') {
+        vga_print_new_line();
+        col = 2;
+        return;
+    }
+    vga_mem[col + (row * VGA_WIDTH)] = (White << 8) | c;
+    ++col;
+}
+
 void vga_put_num(u64 num, u8 base) {
     char base_chars[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
     char tmp[64] = {0};
@@ -93,4 +107,48 @@ void vga_draw_sidewall(char *str, Color color) {
 
 void vga_draw_boot_screen() {
     vga_draw_sidewall("ZEPHYR ONLINE", LightGreen);
+}
+
+void vga_printf(char *fmt, ...) {
+	__builtin_va_list args;
+	__builtin_va_start(args, fmt);
+
+	for (char *c = fmt; *c != 0; c++) {
+		if (*c != '%') {
+			vga_putc(*c);
+			continue;
+		}
+
+		c++;
+		switch (*c) {
+			case 'c': {
+				char i = __builtin_va_arg(args, int);
+				vga_putc(i);
+			} break;
+			case 's': {
+				char *s = __builtin_va_arg(args, char *);
+				vga_puts(s);
+			} break;
+			case 'd': {
+				i32 i = __builtin_va_arg(args, int);
+				vga_put_num(i, 10);
+			} break;
+			case 'x': {
+				i32 i = __builtin_va_arg(args, int);
+				vga_put_num(i, 16);
+			} break;
+			case 'b': {
+				i32 i = __builtin_va_arg(args, int);
+				vga_put_num(i, 2);
+			} break;
+			case 'p': {
+				i32 i = __builtin_va_arg(args, int);
+				vga_putc('0');
+				vga_putc('x');
+				vga_put_num(i, 16);
+			} break;
+		}
+	}
+
+	__builtin_va_end(args);
 }

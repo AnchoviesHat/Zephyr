@@ -25,3 +25,4 @@ void vga_draw_boot_screen();
 void vga_puts(char *str);
 void vga_put_num(u64 num, u8 base);
 void vga_draw_sidewall(char *str, Color color);
+void vga_printf(char *fmt, ...);

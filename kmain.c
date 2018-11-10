@@ -35,7 +35,7 @@ void halt() {
 void kmain() {
     vga_clear_screen();
     vga_draw_boot_screen();
-    vga_puts("Booting Zephyr...\n");
+    vga_printf("Booting Zephyr...\n");
 
     mem_map_t *mem_map = (mem_map_t *)0x7F00;
     u16 mem_map_size = *((u16 *)0x7E00);
@@ -48,9 +48,8 @@ void kmain() {
         }
     }
 
-    vga_puts("Found ");
-    vga_put_num(total_usable_memory / 1024 / 1024, 10);
-    vga_puts("M of usable memory...");
+    vga_printf("Found %dM of usable memory...\n", total_usable_memory / 1024 / 1024);
+
 
     halt();
 }
