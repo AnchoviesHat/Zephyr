@@ -27,11 +27,10 @@ void vga_print_new_line() {
 }
 
 void vga_clear_screen() {
-    for (int i = 0; i < VGA_HEIGHT; ++i) {
-        for (int j = 0; j < VGA_WIDTH; ++j) {
-            vga_mem[j + (i * VGA_WIDTH)] = (Black << 8) | ' ';
-        }
+    for (int i = 0; i < VGA_HEIGHT * VGA_WIDTH; i++) {
+        vga_mem[i] = (Black << 8) | ' ';
     }
+    vga_draw_boot_screen();
     col = 2;
     row = 0;
 }

@@ -11,5 +11,6 @@ u64 strlen(char *str) {
 void strcpy(char *src, char *dest) {
     while(*src != '\0') {
         dest = src;
+        src++;
     }
 }
