@@ -1,5 +1,9 @@
 #include "common.h"
-#include "libvga/libvga.h"
+
+void vga_printf(char *fmt, ...);
+void vga_clear_screen();
+void vga_draw_boot_screen();
+void vga_draw_sidewall(char *str, u8 color);
 
 void outb(u16 port, u8 value) {
     asm volatile ("outb %1, %0" : : "dN" (port), "a" (value));
@@ -26,7 +30,7 @@ typedef struct __attribute__((packed)) {
 } mem_map_t;
 
 void halt() {
-    vga_draw_sidewall("ZEPHYR HALTED", Red);
+    vga_draw_sidewall("ZEPHYR HALTED", 4);
     for (;;) {
         asm ("hlt");
     }

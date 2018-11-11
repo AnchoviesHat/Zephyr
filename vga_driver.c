@@ -1,9 +1,29 @@
-#include "../common.h"
-#include "libvga.h"
-#include "../string/string.h"
+#include "common.h"
+#include "string.h"
+
+typedef enum Color {
+    Black = 0,
+    Blue = 1,
+    Green = 2,
+    Cyan = 3,
+    Red = 4,
+    Magenta = 5,
+    Brown = 6,
+    LightGray = 7,
+    DarkGray = 8,
+    LightBlue = 9,
+    LightGreen = 10,
+    LightCyan = 11,
+    LightRed = 12,
+    Pink = 13,
+    Yellow = 14,
+    White = 15
+} Color;
 
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 25
+
+void vga_draw_boot_screen();
 
 u16 *vga_mem = (u16*)0xB8000;
 u32 col = 2; // Which column we're writing in

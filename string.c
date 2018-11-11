@@ -1,4 +1,4 @@
-#include "../common.h"
+#include "common.h"
 
 u64 strlen(char *str) {
     u64 len = 0;
