@@ -1,9 +1,15 @@
 #include "common.h"
+#include "vga.h"
 
-void vga_printf(char *fmt, ...);
-void vga_clear_screen();
-void vga_draw_boot_screen();
-void vga_draw_sidewall(char *str, u8 color);
+#pragma pack(1)
+typedef struct {
+    u32 base;
+    u32 base_hi;
+    u32 size;
+    u32 size_hi;
+    u32 type;
+} mem_map_t;
+#pragma pack()
 
 void outb(u16 port, u8 value) {
     asm volatile ("outb %1, %0" : : "dN" (port), "a" (value));
@@ -21,13 +27,6 @@ void disable_pic() {
     outb(0xa1, 0xFF);
 }
 
-typedef struct __attribute__((packed)) {
-    u32 base;
-    u32 base_hi;
-    u32 size;
-    u32 size_hi;
-    u32 type;
-} mem_map_t;
 
 void halt() {
     vga_draw_sidewall("ZEPHYR HALTED", 4);
@@ -46,11 +45,16 @@ void kmain() {
 
     u64 total_usable_memory = 0;
 
+    vga_printf("%d\n", mem_map_size);
+
     for (int i = 0; i < mem_map_size; i++) {
+        vga_printf("%x: %x %x\n", mem_map[i].type, mem_map[i].base, mem_map[i].size);
         if (mem_map[i].type == 1) {
             total_usable_memory += mem_map[i].size;
         }
     }
+
+    vga_printf("%d\n", total_usable_memory);
 
     vga_printf("Found %dM of usable memory...\n", total_usable_memory / 1024 / 1024);
 

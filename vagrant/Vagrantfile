@@ -4,7 +4,7 @@ Vagrant.configure(2) do |config|
   host = RbConfig::CONFIG['host_os']
 
   config.vm.provision "shell", path: "bootstrap.sh"
-  config.vm.provision "shell", path: "buildzephyr.sh", run: 'always'
+  config.vm.provision "shell", path: "build_zephyr.sh", run: 'always'
   config.vm.provider :virtualbox do |vb|
       if host =~ /linux/
           vb.customize ["modifyvm", :id,  "--cpus", `nproc`.to_i]

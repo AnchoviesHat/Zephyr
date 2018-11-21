@@ -1,55 +1,36 @@
 #include "common.h"
 #include "string.h"
-
-typedef enum Color {
-    Black = 0,
-    Blue = 1,
-    Green = 2,
-    Cyan = 3,
-    Red = 4,
-    Magenta = 5,
-    Brown = 6,
-    LightGray = 7,
-    DarkGray = 8,
-    LightBlue = 9,
-    LightGreen = 10,
-    LightCyan = 11,
-    LightRed = 12,
-    Pink = 13,
-    Yellow = 14,
-    White = 15
-} Color;
+#include "vga.h"
 
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 25
-
-void vga_draw_boot_screen();
 
 u16 *vga_mem = (u16*)0xB8000;
 u32 col = 2; // Which column we're writing in
 u32 row = 0; // Which row we're writing in
 
-void vga_print_new_line() {
+void vga_print_new_line(void) {
     ++row;
     col = 2;
     if (row >= VGA_HEIGHT) {
         for (int i = 1; i < VGA_HEIGHT; ++i) {
             for (int j = 0; j < VGA_WIDTH; ++j) {
-                vga_mem[j + (i-1 * VGA_WIDTH)] = vga_mem[j + (i * VGA_WIDTH)];
+                vga_mem[j + ((i - 1) * VGA_WIDTH)] = vga_mem[j + (i * VGA_WIDTH)];
             }
         }
         for (int i = 0; i < VGA_WIDTH; ++i) {
-            vga_mem[(VGA_HEIGHT-1) + (i-1 * VGA_WIDTH)] = (Black << 8) | ' ';
+            vga_mem[(VGA_HEIGHT - 1) + ((i - 1) * VGA_WIDTH)] = (Black << 8) | ' ';
         }
 
         vga_draw_boot_screen();
     }
 }
 
-void vga_clear_screen() {
+void vga_clear_screen(void) {
     for (int i = 0; i < VGA_HEIGHT * VGA_WIDTH; i++) {
         vga_mem[i] = (Black << 8) | ' ';
     }
+
     vga_draw_boot_screen();
     col = 2;
     row = 0;
@@ -92,19 +73,30 @@ void vga_putc(char c) {
 
 void vga_put_num(u64 num, u8 base) {
     char base_chars[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-    char tmp[64] = {0};
+    char tmp[20] = {0};
+    char buf[20] = {0};
+    int top;
+    int i = 0;
+    int j;
 
     if (num == 0) {
-        vga_puts("0");
+        vga_putc('0');
         return;
     }
 
-    int i = 0;
     while (num != 0) {
         tmp[i++] = base_chars[num % base];
         num /= base;
     }
-    vga_puts(tmp);
+
+    top = i - 1;
+    i--;
+    for (j = 0; j < top; j++) {
+       buf[j] = tmp[i--]; 
+    }
+    buf[j] = 0;
+
+    vga_puts(buf);
 }
 
 void vga_draw_sidewall(char *str, Color color) {
@@ -119,7 +111,7 @@ void vga_draw_sidewall(char *str, Color color) {
     row = 0;
 }
 
-void vga_draw_boot_screen() {
+void vga_draw_boot_screen(void) {
     vga_draw_sidewall("ZEPHYR ONLINE", LightGreen);
 }
 
@@ -148,7 +140,7 @@ void vga_printf(char *fmt, ...) {
 				vga_put_num(i, 10);
 			} break;
 			case 'x': {
-				i32 i = __builtin_va_arg(args, int);
+				u32 i = __builtin_va_arg(args, int);
 				vga_put_num(i, 16);
 			} break;
 			case 'b': {

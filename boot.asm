@@ -32,7 +32,7 @@ set_a20:
 
 read_disk:
     mov ah, 0x2    ; Read sectors
-    mov al, 20     ; Sectors to read
+    mov al, 40     ; Sectors to read
     mov ch, 0      ; cylinder idx
     mov dh, 0      ; head idx
     mov cl, 2      ; sector idx
